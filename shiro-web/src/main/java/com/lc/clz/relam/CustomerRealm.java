@@ -1,5 +1,7 @@
 package com.lc.clz.relam;
 
+import com.lc.clz.dao.UserDao;
+import com.lc.clz.entity.User;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -11,6 +13,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,12 +24,8 @@ import java.util.Set;
  */
 public class CustomerRealm extends AuthorizingRealm{
 
-    Map<String,String> userMap=new HashMap<String, String>();
-
-    {
-        userMap.put("clz","e76fc5c72441c710bcee02854fc52463");
-        super.setName("customerRealm");
-    }
+    @Resource
+    private UserDao userDao;
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
@@ -84,12 +83,16 @@ public class CustomerRealm extends AuthorizingRealm{
     }
 
     /**
-     * 模拟数据库获取密码
+     * 数据库中获取密码
      * @param userName
      * @return
      */
     private String getPasswordByUserName(String userName){
-        return userMap.get(userName);
+        User user=userDao.getUserByUserName(userName);
+        if (user!=null){
+            return user.getPassword();
+        }
+        return null;
     }
 
 
