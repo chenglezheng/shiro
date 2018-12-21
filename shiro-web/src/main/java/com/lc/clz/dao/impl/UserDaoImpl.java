@@ -22,7 +22,7 @@ public class UserDaoImpl implements UserDao{
    private JdbcTemplate jdbcTemplate;
 
     public User getUserByUserName(String username) {
-        String sql="select username,password from user where username=?";
+        String sql="select user_name,USER_PWD from user where user_name=?";
         List<User> list=jdbcTemplate.query(sql, new String[]{username}, new RowMapper<User>() {
             public User mapRow(ResultSet resultSet,int i) throws SQLException{
                 User user=new User();
