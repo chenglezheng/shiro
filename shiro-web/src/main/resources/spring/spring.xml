@@ -2,13 +2,17 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-                                                http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context.xsd">
-
+                                                http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    <!--导入数据配置-->
     <import resource="spirng-jdbc.xml"/>
+    <import resource="spring-jedis.xml"/>
+
+    <!--扫描包-->
     <context:component-scan base-package="com.lc.clz"/>
 
-    <!--配置过滤器-->
+    <!--配置shiro过滤器-->
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="defaultWebSecurityManager"></property>
         <property name="loginUrl" value="login.html"></property>
@@ -17,14 +21,27 @@
             <value>
                 /login.html = anon
                 /subLogin =anon
+                /testRole = rolesOr["admin"]
+                /testRole1 = rolesOr["admin","admin1"]
+                /testPer =perms["admin:update"]
+                /testPer1 =perms["admin:delete"]
                 /* =authc
             </value>
         </property>
+        <property name="filters">
+            <util:map>
+                <entry key="rolesOr" value-ref="rolesOrFilter"/>
+            </util:map>
+        </property>
     </bean>
+
+    <!--创建自定义role权限-->
+    <bean class="com.lc.clz.filter.RolesOrFilter" id="rolesOrFilter"></bean>
 
     <!--创建SecurityManager对象-->
     <bean class="org.apache.shiro.web.mgt.DefaultWebSecurityManager" id="defaultWebSecurityManager">
-        <property name="realm" ref="customerRealm"></property>
+        <property name="realm" ref="customerRealm" />
+        <property name="sessionManager" ref="sessionManager" />
     </bean>
 
     <!--创建自定义的Realm对象-->
@@ -32,9 +49,15 @@
         <property name="credentialsMatcher" ref="credentialsMatcher"/>
     </bean>
 
+    <!--shiro利用redis作session缓存-->
+    <bean class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager" id="sessionManager">
+        <property name="sessionDAO" ref="redisSessionDao"/>
+    </bean>
+    <bean class="com.lc.clz.session.RedisSessionDao" id="redisSessionDao"/>
+
+    <!--加密-->
     <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher" id="credentialsMatcher">
         <property name="hashAlgorithmName" value="md5" />
         <property name="hashIterations" value="1" />
     </bean>
-
 </beans>

@@ -3,6 +3,7 @@ package com.lc.clz.controller;
 import com.lc.clz.entity.User;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +28,37 @@ public class UserController {
         }catch(Exception e){
             return e.getMessage();
         }
-        return "登陆成功";
+        /*if (subject.hasRole("admin")){
+            return "有admin权限";
+        }*/
+        if(subject.isPermitted("admin:update")){
+            return "有更新的权利";
+        }
+        return "权限不足";
     }
 
+
+    @RequestMapping(value = "/testRole",method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String testRole() {
+        return "testRole success";
+    }
+
+    @RequestMapping(value = "/testRole1",method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String testRole1() {
+        return "testRole1 success";
+    }
+
+    @RequestMapping(value = "/testPer",method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String testPer() {
+        return "testPer success";
+    }
+
+    @RequestMapping(value = "/testPer1",method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String testPer1() {
+        return "testPer1 success";
+    }
 }

@@ -22,12 +22,12 @@ public class UserDaoImpl implements UserDao{
    private JdbcTemplate jdbcTemplate;
 
     public User getUserByUserName(String username) {
-        String sql="select user_name,USER_PWD from user where user_name=?";
+        String sql="select USER_NAME,USER_PASSWORD from USERS where USER_NAME=?";
         List<User> list=jdbcTemplate.query(sql, new String[]{username}, new RowMapper<User>() {
             public User mapRow(ResultSet resultSet,int i) throws SQLException{
                 User user=new User();
-                user.setUsername(resultSet.getString("user_name"));
-                user.setPassword(resultSet.getString("user_pwd"));
+                user.setUsername(resultSet.getString("USER_NAME"));
+                user.setPassword(resultSet.getString("USER_PASSWORD"));
                 return user;
             }
         });
@@ -36,5 +36,35 @@ public class UserDaoImpl implements UserDao{
             return null;
         }
         return list.get(0);
+    }
+
+
+    public List<String> getRoleByUserName(String username) {
+        String sql="select role_name from USER_ROLES where USER_NAME=?";
+        List<String> list=jdbcTemplate.query(sql, new String[]{username}, new RowMapper<String>() {
+            public String mapRow(ResultSet resultSet,int i) throws SQLException{
+                return resultSet.getString("role_name");
+            }
+        });
+        //判断集合是否为空
+        if(CollectionUtils.isEmpty(list)){
+            return null;
+        }
+        return list;
+    }
+
+
+    public List<String> getPermissionByUserName(String username) {
+        String sql="select permission_name from USER_PERMISSION where USER_NAME=?";
+        List<String> list=jdbcTemplate.query(sql, new String[]{username}, new RowMapper<String>() {
+            public String mapRow(ResultSet resultSet,int i) throws SQLException{
+                return resultSet.getString("permission_name");
+            }
+        });
+        //判断集合是否为空
+        if(CollectionUtils.isEmpty(list)){
+            return null;
+        }
+        return list;
     }
 }
