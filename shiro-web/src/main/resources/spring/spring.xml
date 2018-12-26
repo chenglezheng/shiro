@@ -42,6 +42,8 @@
     <bean class="org.apache.shiro.web.mgt.DefaultWebSecurityManager" id="defaultWebSecurityManager">
         <property name="realm" ref="customerRealm" />
         <property name="sessionManager" ref="sessionManager" />
+        <property name="cacheManager" ref="redisCacheManager" />
+        <property name="rememberMeManager" ref="cookieRememberMeManager" />
     </bean>
 
     <!--创建自定义的Realm对象-->
@@ -50,10 +52,23 @@
     </bean>
 
     <!--shiro利用redis作session缓存-->
-    <bean class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager" id="sessionManager">
+    <bean class="com.lc.clz.session.CustomSesionManager" id="sessionManager">
         <property name="sessionDAO" ref="redisSessionDao"/>
     </bean>
     <bean class="com.lc.clz.session.RedisSessionDao" id="redisSessionDao"/>
+
+    <!--创建redis缓存管理-->
+    <bean class="com.lc.clz.cache.RedisCacheManager" id="redisCacheManager" />
+
+    <bean class="org.apache.shiro.web.mgt.CookieRememberMeManager" id="cookieRememberMeManager">
+        <property name="cookie" ref="simpleCookie"/>
+    </bean>
+
+    <!--cookie管理（实现记住我功能）-->
+    <bean class="org.apache.shiro.web.servlet.SimpleCookie" id="simpleCookie">
+        <constructor-arg value="remeberMe"/>
+        <property name="maxAge" value="600000000" />
+    </bean>
 
     <!--加密-->
     <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher" id="credentialsMatcher">

@@ -7,6 +7,15 @@ public class User {
 
     private String username;
     private String password;
+    private Boolean remeberMe;
+
+    public Boolean getRemeberMe() {
+        return remeberMe;
+    }
+
+    public void setRemeberMe(Boolean remeberMe) {
+        this.remeberMe = remeberMe;
+    }
 
     public String getUsername() {
         return username;
